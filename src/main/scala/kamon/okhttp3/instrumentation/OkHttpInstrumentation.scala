@@ -25,7 +25,7 @@ class OkHttpInstrumentation extends KanelaInstrumentation {
   /**
     * Instrument:
     *
-    * akka.actor.ActorCell::constructor
+    * okhttp3.OkHttpClient::constructor
     */
   forTargetType("okhttp3.OkHttpClient") { builder =>
     builder

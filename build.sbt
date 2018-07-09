@@ -15,8 +15,8 @@
 
 
 val kamonCore           = "io.kamon"            	%% "kamon-core"               	  % "1.1.3"
-val kamonE          = "io.kamon"            	%% "kamon-executors"               	  % "1.0.3"
 val kamonTestkit        = "io.kamon"            	%% "kamon-testkit"            	  % "1.1.3"
+val kamonExecutors      = "io.kamon"            	%% "kamon-executors"           	  % "1.0.3"
 val scalaExtension      = "io.kamon"            	%% "kanela-scala-extension"   	  % "0.0.10"
 
 val okhttp     		      = "com.squareup.okhttp3" 	% "okhttp"	    		              % "3.10.0"
@@ -31,7 +31,7 @@ lazy val okHttp3 = (project in file("."))
   .settings(AutomaticModuleName.settings("kamon.okhttp"))
   .settings(
       libraryDependencies ++=
-        compileScope(kamonCore, okhttp, scalaExtension, kamonE) ++
+        compileScope(kamonCore, okhttp, scalaExtension, kamonExecutors) ++
         providedScope(lombok) ++
         testScope(kamonTestkit, scalatest, slf4jApi, logbackClassic))
 
