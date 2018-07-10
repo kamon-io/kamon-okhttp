@@ -16,6 +16,7 @@
 
 package kamon.okhttp3.instrumentation
 
+import kamon.okhttp3.OkHttp
 import kanela.agent.libs.net.bytebuddy.asm.Advice
 import kanela.agent.scala.KanelaInstrumentation
 import okhttp3.OkHttpClient
@@ -41,6 +42,7 @@ class OkHttpClientBuilderAdvisor
 object OkHttpClientBuilderAdvisor {
   @Advice.OnMethodEnter(suppress = classOf[Throwable])
   def addKamonInterceptor(@Advice.Argument(0) builder:OkHttpClient.Builder): Unit = {
-    builder.addNetworkInterceptor(new KamonInterceptor())
+    if(OkHttp.metricsEnabled) builder.addNetworkInterceptor(new KamonMetricsInterceptor)
+    builder.addNetworkInterceptor(new KamonTracingInterceptor)
   }
 }

@@ -23,7 +23,7 @@ import okhttp3.{Interceptor, Request, Response}
 
 import scala.util.{Failure, Success, Try}
 
-class KamonInterceptor extends Interceptor {
+final class KamonTracingInterceptor extends Interceptor  {
 
   override def intercept(chain: Interceptor.Chain): Response = {
     val request: Request = chain.request
@@ -46,7 +46,7 @@ class KamonInterceptor extends Interceptor {
     val requestWithContext = encodeContext(contextWithClientSpan, request)
 
     val response = Try(chain.proceed(requestWithContext)) match {
-      case Success(resultSetFuture) => resultSetFuture
+      case Success(successfulResponse) => successfulResponse
       case Failure(cause) =>
         clientRequestSpan.addError(cause.getMessage, cause)
         clientRequestSpan.finish()

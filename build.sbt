@@ -21,6 +21,7 @@ val scalaExtension      = "io.kamon"            	%% "kanela-scala-extension"   	
 
 val okhttp     		      = "com.squareup.okhttp3" 	% "okhttp"	    		              % "3.10.0"
 val lombok              = "org.projectlombok"    	% "lombok"                    	  % "1.18.0"
+val undertow            = "io.undertow"          	% "undertow-core"              	  % "2.0.9.Final"
 
 lazy val okHttp3 = (project in file("."))
   .enablePlugins(JavaAgent)
@@ -33,6 +34,6 @@ lazy val okHttp3 = (project in file("."))
       libraryDependencies ++=
         compileScope(kamonCore, okhttp, scalaExtension, kamonExecutors) ++
         providedScope(lombok) ++
-        testScope(kamonTestkit, scalatest, slf4jApi, logbackClassic))
+        testScope(kamonTestkit, scalatest, slf4jApi, logbackClassic, undertow))
 
 

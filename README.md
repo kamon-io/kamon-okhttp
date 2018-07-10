@@ -2,13 +2,12 @@ OkHttp3 Integration   ![Build Status](https://travis-ci.org/kamon-io/kamon-okhtt
 ==========================
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/kamon-io/Kamon?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.kamon/kamon-cassandra_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.kamon/kamon-okhttp_2.12)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.kamon/kamon-okhttp_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.kamon/kamon-okhttp_2.12)
 
 
 The `kamon-okhttp` module brings bytecode instrumentation to trace okhttp requests
 
-The <b>kamon-cassandra</b> module requires you to start your application using the Kanela Agent. Kamon will warn you
-at startup if you failed to do so.
+The <b>kamon-okhttp</b> module requires you to start your application using the Kanela Agent.
 
 The bytecode instrumentation provided by the `kamon-okhttp` module hooks into the client to automatically
 start and finish Spans for requests that are issued within a trace. This translates into you having metrics about how
@@ -36,8 +35,6 @@ libraryDependencies += "io.kamon" %% "kamon-okhttp" % "1.0.0"
 
 The following metrics will be recorded:
 
-* __reads__: a histogram that tracks the reads requests latency (SELECT statement).
-* __writes__: a histogram that tracks the writes requests latency (INSERT, UPDATE, and DELETE statements).
-* __slows__: a simple counter with the number of measured slow requests.
-* __errors__: a simple counter with the number of failures.
-
+* __active-requests__: The the number active requests.
+* __abnormal-termination__: The number of abnormal requests termination.
+* __http-request__: Request time by status code.

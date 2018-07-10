@@ -22,9 +22,12 @@ import kamon.{Kamon, OnReconfigureHook}
 import okhttp3.Request
 
 object OkHttp {
-  @volatile var nameGenerator: NameGenerator = nameGeneratorFromConfig(Kamon.config())
 
-  def generateOperationName(request: Request): String = nameGenerator.generateOperationName(request)
+  @volatile var nameGenerator: NameGenerator = nameGeneratorFromConfig(Kamon.config())
+  @volatile var metricsEnabled: Boolean = metricsFromConfig(Kamon.config())
+
+  def generateOperationName(request: Request): String =
+    nameGenerator.generateOperationName(request)
 
   private def nameGeneratorFromConfig(config: Config): NameGenerator = {
     val dynamic = new DynamicAccess(getClass.getClassLoader)
@@ -32,10 +35,13 @@ object OkHttp {
     dynamic.createInstanceFor[NameGenerator](nameGeneratorFQCN, Nil).get
   }
 
+  def metricsFromConfig(config: Config): Boolean =
+    config.getBoolean("kamon.okhttp.metrics.enabled")
 
   Kamon.onReconfigure(new OnReconfigureHook {
     override def onReconfigure(newConfig: Config): Unit = {
       nameGenerator = nameGeneratorFromConfig(newConfig)
+      metricsEnabled = metricsFromConfig(newConfig)
     }
   })
 }
