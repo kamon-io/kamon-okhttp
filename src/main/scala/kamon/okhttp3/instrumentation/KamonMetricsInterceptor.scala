@@ -36,7 +36,9 @@ final class KamonMetricsInterceptor extends Interceptor  {
         metrics.generalMetrics.abnormalTerminations.record(System.nanoTime() - startTimestamp)
         throw t
     } finally {
-      metrics.requestTimeMetrics.forMethod(request.method()).record(System.nanoTime() - startTimestamp)
+      val elapsed = System.nanoTime() - startTimestamp
+      metrics.requestTimeMetrics.forMethod(request.method()).record(elapsed)
+      metrics.requestTimeMetrics.forMethod("total").record(elapsed)
       metrics.generalMetrics.activeRequests.decrement()
     }
   }

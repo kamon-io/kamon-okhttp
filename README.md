@@ -37,4 +37,4 @@ The following metrics will be recorded:
 
 * __active-requests__: The the number active requests.
 * __abnormal-termination__: The number of abnormal requests termination.
-* __http-request__: Request time by status code.
+* __http-request__: Request time by http method.
