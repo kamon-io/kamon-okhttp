@@ -16,13 +16,33 @@
 
 package kamon.okhttp3.instrumentation
 
-import kamon.okhttp3.instrumentation.advisor.OkHttpClientBuilderAdvisor
+import kamon.okhttp3.OkHttp
+import kanela.agent.libs.net.bytebuddy.asm.Advice
 import kanela.agent.scala.KanelaInstrumentation
+import okhttp3.OkHttpClient
 
 class OkHttpInstrumentation extends KanelaInstrumentation {
-  forTargetType("okhttp3.OkHttpClient$Builder") { builder =>
+
+  /**
+    * Instrument:
+    *
+    * okhttp3.OkHttpClient::constructor
+    */
+  forTargetType("okhttp3.OkHttpClient") { builder =>
     builder
-      .withAdvisorFor(isConstructor().and(takesArguments(1)), classOf[OkHttpClientBuilderAdvisor])
+      .withAdvisorFor(isConstructor().and(takesOneArgumentOf("okhttp3.OkHttpClient$Builder")), classOf[OkHttpClientBuilderAdvisor])
       .build()
+  }
+}
+
+/**
+  * Avisor for okhttp3.OkHttpClient::constructor(OkHttpClient.Builder)
+  */
+class OkHttpClientBuilderAdvisor
+object OkHttpClientBuilderAdvisor {
+  @Advice.OnMethodEnter(suppress = classOf[Throwable])
+  def addKamonInterceptor(@Advice.Argument(0) builder:OkHttpClient.Builder): Unit = {
+    if(OkHttp.metricsEnabled) builder.addNetworkInterceptor(new KamonMetricsInterceptor)
+    builder.addNetworkInterceptor(new KamonTracingInterceptor)
   }
 }
