@@ -44,8 +44,8 @@ object OkHttpClientBuilderAdvisor {
 
   @Advice.OnMethodEnter(suppress = classOf[Throwable])
   def addKamonInterceptor(@Advice.Argument(0) builder:OkHttpClient.Builder): Unit = {
-    val interceptors = builder.interceptors()
-    if(!interceptors.asScala.exists(_.isInstanceOf[KamonTracingInterceptor])) {
+    val interceptors = builder.networkInterceptors.asScala
+    if(!interceptors.exists(_.isInstanceOf[KamonTracingInterceptor])) {
       if (OkHttp.metricsEnabled) builder.addNetworkInterceptor(new KamonMetricsInterceptor)
       builder.addNetworkInterceptor(new KamonTracingInterceptor)
     }
