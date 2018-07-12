@@ -52,7 +52,7 @@ class OkHttpTracingInstrumentationSpec extends WordSpec
 
       eventually(timeout(3 seconds)) {
         val span = reporter.nextSpan().value
-        span.operationName shouldBe "https://publicobject.com/helloworld.txt"
+        span.operationName shouldBe "https://publicobject.com"
         span.tags("span.kind") shouldBe TagValue.String("client")
         span.tags("component") shouldBe TagValue.String("okhttp")
         span.tags("http.method") shouldBe TagValue.String("GET")
@@ -79,7 +79,7 @@ class OkHttpTracingInstrumentationSpec extends WordSpec
 
       eventually(timeout(3 seconds)) {
         val span = reporter.nextSpan().value
-        span.operationName shouldBe "https://publicobject.com/helloworld.txt"
+        span.operationName shouldBe "https://publicobject.com"
         span.tags("span.kind") shouldBe TagValue.String("client")
         span.tags("component") shouldBe TagValue.String("okhttp")
         span.tags("http.method") shouldBe TagValue.String("GET")

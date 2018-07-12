@@ -40,9 +40,14 @@ class OkHttpInstrumentation extends KanelaInstrumentation {
   */
 class OkHttpClientBuilderAdvisor
 object OkHttpClientBuilderAdvisor {
+  import scala.collection.JavaConverters._
+
   @Advice.OnMethodEnter(suppress = classOf[Throwable])
   def addKamonInterceptor(@Advice.Argument(0) builder:OkHttpClient.Builder): Unit = {
-    if(OkHttp.metricsEnabled) builder.addNetworkInterceptor(new KamonMetricsInterceptor)
-    builder.addNetworkInterceptor(new KamonTracingInterceptor)
+    val interceptors = builder.interceptors()
+    if(!interceptors.asScala.exists(_.isInstanceOf[KamonTracingInterceptor])) {
+      if (OkHttp.metricsEnabled) builder.addNetworkInterceptor(new KamonMetricsInterceptor)
+      builder.addNetworkInterceptor(new KamonTracingInterceptor)
+    }
   }
 }

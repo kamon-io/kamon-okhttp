@@ -51,7 +51,6 @@ trait NameGenerator {
 }
 
 class DefaultNameGenerator extends NameGenerator {
-  override def generateOperationName(request: Request): String = {
-    request.url().uri().toASCIIString
-  }
+  override def generateOperationName(request: Request): String =
+    s"${request.url().uri().getScheme}://${request.url().uri().getAuthority}"
 }

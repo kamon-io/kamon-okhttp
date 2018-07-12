@@ -36,7 +36,7 @@ final class KamonTracingInterceptor extends Interceptor  {
       .withMetricTag("span.kind", "client")
       .withMetricTag("component", "okhttp")
       .withMetricTag("http.method", request.method)
-      .withTag("http.url", request.url().uri().toASCIIString)
+      .withTag("http.url", request.url().toString)
 
     val clientRequestSpan = currentContext.get(SpanCustomizer.ContextKey)
       .customize(clientSpanBuilder)
