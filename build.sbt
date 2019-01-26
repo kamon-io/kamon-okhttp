@@ -24,7 +24,7 @@ val undertow            = "io.undertow"          	% "undertow-core"             
 
 lazy val okHttp3 = (project in file("."))
   .enablePlugins(JavaAgent)
-  .settings(name := "kamon-okhttp3")
+  .settings(name := "kamon-okhttp")
   .settings(javaAgents += "io.kamon"    % "kanela-agent"   % "0.0.15"  % "compile;test")
   .settings(resolvers += Resolver.bintrayRepo("kamon-io", "snapshots"))
   .settings(resolvers += Resolver.mavenLocal)
