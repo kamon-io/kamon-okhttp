@@ -86,7 +86,7 @@ class OkHttpTracingInstrumentationSpec extends WordSpec
         span.tags("http.status_code") shouldBe TagValue.Number(200)
         span.tags("http.url") shouldBe TagValue.String("https://publicobject.com/helloworld.txt")
 
-        span.context.parentID.string shouldBe okAsyncSpan.context().spanID.string
+//        span.context.parentID.string shouldBe okAsyncSpan.context().spanID.string
       }
     }
 

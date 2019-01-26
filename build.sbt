@@ -16,7 +16,6 @@
 
 val kamonCore           = "io.kamon"            	%% "kamon-core"               	  % "1.1.3"
 val kamonTestkit        = "io.kamon"            	%% "kamon-testkit"            	  % "1.1.3"
-val kamonExecutors      = "io.kamon"            	%% "kamon-executors"           	  % "1.0.3"
 val scalaExtension      = "io.kamon"            	%% "kanela-scala-extension"   	  % "0.0.10"
 
 val okhttp     		      = "com.squareup.okhttp3" 	% "okhttp"	    		              % "3.10.0"
@@ -26,13 +25,13 @@ val undertow            = "io.undertow"          	% "undertow-core"             
 lazy val okHttp3 = (project in file("."))
   .enablePlugins(JavaAgent)
   .settings(name := "kamon-okhttp3")
-  .settings(javaAgents += "io.kamon"    % "kanela-agent"   % "0.0.12"  % "compile;test")
+  .settings(javaAgents += "io.kamon"    % "kanela-agent"   % "0.0.15"  % "compile;test")
   .settings(resolvers += Resolver.bintrayRepo("kamon-io", "snapshots"))
   .settings(resolvers += Resolver.mavenLocal)
   .settings(AutomaticModuleName.settings("kamon.okhttp"))
   .settings(
       libraryDependencies ++=
-        compileScope(kamonCore, okhttp, scalaExtension, kamonExecutors) ++
+        compileScope(kamonCore, okhttp, scalaExtension) ++
         providedScope(lombok) ++
         testScope(kamonTestkit, scalatest, slf4jApi, logbackClassic, undertow))
 
