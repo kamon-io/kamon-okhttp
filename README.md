@@ -21,13 +21,13 @@ Supported releases and dependencies are shown below.
 
 | kamon-okhttp  | status | jdk  | scala            
 |:------:|:------:|:----:|------------------
-|  1.0.2 | stable | 1.8+ | 2.11, 2.12  
+|  1.0.3 | stable | 1.8+ | 2.11, 2.12  
 
 To get started with SBT, simply add the following to your `build.sbt`
 file:
 
 ```scala
-libraryDependencies += "io.kamon" %% "kamon-okhttp" % "1.0.2"
+libraryDependencies += "io.kamon" %% "kamon-okhttp" % "1.0.3"
 ```
 
 
