@@ -1,5 +1,5 @@
 /* =========================================================================================
- * Copyright © 2013-2018 the kamon project <http://kamon.io/>
+ * Copyright © 2013-2019 the kamon project <http://kamon.io/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License") you may not use this file
  * except in compliance with the License. You may obtain a copy of the License at
@@ -18,7 +18,7 @@ package kamon.okhttp3.instrumentation
 import java.util.concurrent.Executors
 
 import io.undertow.Undertow
-import io.undertow.server.HttpServerExchange
+import io.undertow.server.{HttpHandler, HttpServerExchange}
 import io.undertow.util.{Headers, StatusCodes => UStatusCodes}
 import kamon.okhttp3.Metrics.{GeneralMetrics, RequestTimeMetrics}
 import kamon.testkit.MetricInspection
@@ -79,12 +79,13 @@ class OkHttpMetricsSpec extends WordSpec with Matchers with Eventually with Span
   var server:Undertow = _
 
   override protected def beforeAll(): Unit = {
-    server = Undertow.builder.addHttpListener(9290, "localhost").setHandler(
-      (exchange: HttpServerExchange) => {
+    server = Undertow.builder.addHttpListener(9290, "localhost").setHandler(new HttpHandler{
+      override def handleRequest(exchange: HttpServerExchange): Unit = {
         exchange.getResponseHeaders.put(Headers.CONTENT_TYPE, "text/plain")
         exchange.setStatusCode(UStatusCodes.OK)
         exchange.getResponseSender.send("Hello World")
-      }).build
+      }
+    }).build
     server.start()
   }
 
