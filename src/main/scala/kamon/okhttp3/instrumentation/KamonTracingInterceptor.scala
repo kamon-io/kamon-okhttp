@@ -1,6 +1,6 @@
 /*
  * =========================================================================================
- * Copyright © 2013-2018 the kamon project <http://kamon.io/>
+ * Copyright © 2013-2020 the kamon project <http://kamon.io/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  * except in compliance with the License. You may obtain a copy of the License at
@@ -16,56 +16,20 @@
 
 package kamon.okhttp3.instrumentation
 
-import kamon.Kamon
-import kamon.okhttp3.OkHttp
-import kamon.trace.{Span, SpanCustomizer}
-import okhttp3.{Interceptor, Request, Response}
+import okhttp3.{Interceptor, Response}
 
-import scala.util.{Failure, Success, Try}
-
-final class KamonTracingInterceptor extends Interceptor  {
+final class KamonTracingInterceptor extends Interceptor {
 
   override def intercept(chain: Interceptor.Chain): Response = {
-    val request: Request = chain.request
-
-    val currentContext = Kamon.currentContext()
-    val parentSpan = currentContext.get(Span.ContextKey)
-
-    val clientSpanBuilder = Kamon.buildSpan(OkHttp.generateOperationName(request))
-      .asChildOf(parentSpan)
-      .withMetricTag("span.kind", "client")
-      .withMetricTag("component", "okhttp")
-      .withMetricTag("http.method", request.method)
-      .withTag("http.url", request.url().toString)
-
-    val clientRequestSpan = currentContext.get(SpanCustomizer.ContextKey)
-      .customize(clientSpanBuilder)
-      .start()
-
-    val contextWithClientSpan = currentContext.withKey(Span.ContextKey, clientRequestSpan)
-    val requestWithContext = encodeContext(contextWithClientSpan, request)
-
-    val response = Try(chain.proceed(requestWithContext)) match {
-      case Success(successfulResponse) => successfulResponse
-      case Failure(cause) =>
-        clientRequestSpan.addError(cause.getMessage, cause)
-        clientRequestSpan.finish()
-        throw cause
+    val request = chain.request
+    val clientRequestHandler = KamonOkHttpTracing.withNewSpan(request)
+    try {
+      val response = chain.proceed(request)
+      KamonOkHttpTracing.successContinuation(clientRequestHandler, response)
+    } catch {
+      case error: Throwable =>
+        KamonOkHttpTracing.failureContinuation(clientRequestHandler, error)
+        throw error
     }
-
-    val statusCode = response.code()
-
-    clientRequestSpan.tag("http.status_code", statusCode)
-
-    if(isError(statusCode))
-      clientRequestSpan.addError("error")
-
-    if(statusCode == StatusCodes.NotFound)
-      clientRequestSpan.setOperationName("not-found")
-
-    clientRequestSpan.finish()
-    response
   }
 }
-
-

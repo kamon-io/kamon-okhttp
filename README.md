@@ -15,19 +15,19 @@ the requests you are doing are behaving.
 
 ### Getting Started
 
-Kamon OkHttp module is currently available for Scala 2.11 and 2.12.
+Kamon OkHttp module is currently available for Scala `2.11`, `2.12` and `2.13`.
 
 Supported releases and dependencies are shown below.
 
 | kamon-okhttp  | status | jdk  | scala            
 |:------:|:------:|:----:|------------------
-|  1.0.3 | stable | 1.8+ | 2.11, 2.12  
+|  2.0.0 | stable | 1.8+ | 2.11, 2.12, 2.13  
 
 To get started with SBT, simply add the following to your `build.sbt`
 file:
 
-```scala
-libraryDependencies += "io.kamon" %% "kamon-okhttp" % "1.0.3"
+```sbt
+libraryDependencies += "io.kamon" %% "kamon-okhttp" % "2.0.0"
 ```
 
 
