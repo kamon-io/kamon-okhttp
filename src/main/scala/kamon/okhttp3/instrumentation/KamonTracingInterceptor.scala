@@ -21,8 +21,8 @@ import okhttp3.{Interceptor, Response}
 final class KamonTracingInterceptor extends Interceptor {
 
   override def intercept(chain: Interceptor.Chain): Response = {
-    val request = chain.request
-    val clientRequestHandler = KamonOkHttpTracing.withNewSpan(request)
+    val clientRequestHandler = KamonOkHttpTracing.withNewSpan(chain.request)
+    val request = clientRequestHandler.request
     try {
       val response = chain.proceed(request)
       KamonOkHttpTracing.successContinuation(clientRequestHandler, response)

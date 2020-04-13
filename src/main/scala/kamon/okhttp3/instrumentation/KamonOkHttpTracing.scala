@@ -19,6 +19,7 @@ package kamon.okhttp3.instrumentation
 import java.util
 
 import kamon.Kamon
+import kamon.context.HttpPropagation.HeaderWriter
 import kamon.instrumentation.http.{HttpClientInstrumentation, HttpMessage}
 import okhttp3.{Request, Response}
 
@@ -34,16 +35,12 @@ object KamonOkHttpTracing {
   }
 
   def successContinuation(requestHandler: HttpClientInstrumentation.RequestHandler[Request], response: Response): Response = {
-    val statusCode = response.code
-    requestHandler.span.tag("http.status_code", statusCode)
-    if (statusCode >= 500) requestHandler.span.fail("error")
-    if (statusCode == 404) requestHandler.span.name("not-found")
-    requestHandler.span.finish()
+    requestHandler.processResponse(toKamonResponse(response))
     response
   }
 
   def failureContinuation(requestHandler: HttpClientInstrumentation.RequestHandler[Request], error: Throwable): Unit = {
-    requestHandler.span.fail("error.object", error)
+    requestHandler.span.fail(error)
     requestHandler.span.finish()
   }
 
@@ -52,7 +49,13 @@ object KamonOkHttpTracing {
 
     override def read(header: String): Option[String] = Option.apply(request.header(header))
 
-    override def readAll: Map[String, String] = JavaConverters.mapAsScalaMap(request.headers.toMultimap).mapValues((values: util.List[String]) => values.get(0)).toMap(Predef.conforms[Tuple2[String, String]])
+    override def readAll: Map[String, String] = {
+      JavaConverters
+        .mapAsScalaMapConverter(request.headers.toMultimap)
+        .asScala
+        .mapValues((values: util.List[String]) => values.get(0))
+        .toMap
+    }
 
     override def url: String = request.url.toString
 
@@ -74,4 +77,19 @@ object KamonOkHttpTracing {
       request.newBuilder.headers(newHeadersMap.build).build
     }
   }
+
+  def toKamonResponse(response: Response): HttpMessage.Response = new HttpMessage.Response() {
+    override def statusCode: Int = response.code()
+  }
+
+  trait HeaderHandler extends HeaderWriter {
+    private val _headers = mutable.Map[String, String]()
+
+    override def write(header: String, value: String): Unit = {
+      _headers += (header -> value)
+    }
+
+    def headers: mutable.Map[String, String] = _headers
+  }
+
 }
