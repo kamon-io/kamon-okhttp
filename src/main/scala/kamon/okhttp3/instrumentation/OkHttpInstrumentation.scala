@@ -1,6 +1,6 @@
 /*
  * =========================================================================================
- * Copyright © 2013-2018 the kamon project <http://kamon.io/>
+ * Copyright © 2013-2020 the kamon project <http://kamon.io/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  * except in compliance with the License. You may obtain a copy of the License at
@@ -16,37 +16,34 @@
 
 package kamon.okhttp3.instrumentation
 
-import kamon.okhttp3.OkHttp
+import kanela.agent.api.instrumentation.InstrumentationBuilder
 import kanela.agent.libs.net.bytebuddy.asm.Advice
-import kanela.agent.scala.KanelaInstrumentation
 import okhttp3.OkHttpClient
 
-class OkHttpInstrumentation extends KanelaInstrumentation {
+class OkHttpInstrumentation extends InstrumentationBuilder {
 
   /**
     * Instrument:
     *
     * okhttp3.OkHttpClient::constructor
     */
-  forTargetType("okhttp3.OkHttpClient") { builder =>
-    builder
-      .withAdvisorFor(isConstructor().and(takesOneArgumentOf("okhttp3.OkHttpClient$Builder")), classOf[OkHttpClientBuilderAdvisor])
-      .build()
-  }
+  onType("okhttp3.OkHttpClient")
+    .advise(isConstructor() and takesOneArgumentOf("okhttp3.OkHttpClient$Builder"), classOf[OkHttpClientBuilderAdvisor])
 }
 
 /**
   * Avisor for okhttp3.OkHttpClient::constructor(OkHttpClient.Builder)
   */
 class OkHttpClientBuilderAdvisor
+
 object OkHttpClientBuilderAdvisor {
+
   import scala.collection.JavaConverters._
 
   @Advice.OnMethodEnter(suppress = classOf[Throwable])
-  def addKamonInterceptor(@Advice.Argument(0) builder:OkHttpClient.Builder): Unit = {
+  def addKamonInterceptor(@Advice.Argument(0) builder: OkHttpClient.Builder): Unit = {
     val interceptors = builder.networkInterceptors.asScala
-    if(!interceptors.exists(_.isInstanceOf[KamonTracingInterceptor])) {
-      if (OkHttp.metricsEnabled) builder.addNetworkInterceptor(new KamonMetricsInterceptor)
+    if (!interceptors.exists(_.isInstanceOf[KamonTracingInterceptor])) {
       builder.addNetworkInterceptor(new KamonTracingInterceptor)
     }
   }
